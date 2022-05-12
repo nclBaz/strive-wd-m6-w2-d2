@@ -13,10 +13,12 @@ import BooksModel from "./model.js"
 const booksRouter = express.Router()
 
 // 1.
-booksRouter.post("/", (req, res, next) => {
+booksRouter.post("/", async (req, res, next) => {
   // (req, res, next) => {} is the ENDPOINT HANDLER. Is the function that will be executed every time a request on that endpoint is sent. req and res are REQUEST and RESPONSE objects
 
-  res.send({ message: `HELLO I AM THE ${req.method} ROUTE: ` })
+  const newBook = new BooksModel(req.body)
+  const { _id } = await newBook.save()
+  res.send({ _id })
 })
 
 // 2.
@@ -37,6 +39,7 @@ booksRouter.get("/", async (req, res, next) => {
       .skip(mongoQuery.options.skip)
       .limit(mongoQuery.options.limit)
       .sort(mongoQuery.options.sort)
+      .populate({ path: "author", select: "name surname" })
 
     res.send({
       links: mongoQuery.links(`${process.env.API_URL}/books`, total),
@@ -50,8 +53,9 @@ booksRouter.get("/", async (req, res, next) => {
 })
 
 // 3.
-booksRouter.get("/:id", (req, res, next) => {
-  res.send({ message: `HELLO I AM THE ${req.method} ROUTE: ` })
+booksRouter.get("/:id", async (req, res, next) => {
+  const book = await BooksModel.findById(req.params.id).populate({ path: "author", select: "name surname" })
+  res.send(book)
 })
 
 // 4.

@@ -5,6 +5,7 @@ import createError from "http-errors"
 import cors from "cors"
 import usersRouter from "./services/users/index.js"
 import booksRouter from "./services/books/index.js"
+import authorsRouter from "./services/authors/index.js"
 import { badRequestHandler, unauthorizedHandler, forbiddenHandler, notFoundHandler, genericErrorHandler } from "./errorsHandlers.js"
 
 const server = express()
@@ -38,6 +39,7 @@ server.use(express.json()) // if you don't add this line BEFORE the endpoints, a
 
 server.use("/users", usersRouter) // in this case loggerMiddleware is used as a ROUTER LEVEL MIDDLEWARE
 server.use("/books", booksRouter)
+server.use("/authors", authorsRouter)
 
 // *********************** ERROR HANDLERS ********************************
 server.use(badRequestHandler)

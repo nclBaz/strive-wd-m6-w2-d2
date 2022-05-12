@@ -13,6 +13,7 @@ const usersSchema = new Schema(
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     dateOfBirth: { type: Date, required: true },
+    purchaseHistory: [{ title: String, category: String, price: Number, purchaseDate: Date }],
   },
   {
     timestamps: true, // automatically add createdAt and updatedAt fields

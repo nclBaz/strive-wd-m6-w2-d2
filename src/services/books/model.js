@@ -9,6 +9,7 @@ const BooksSchema = new Schema(
     img: { type: String, required: true },
     price: { type: Number, required: true },
     category: { type: String, required: true, enum: ["horror", "fantasy", "romance", "history"] },
+    author: [{ type: mongoose.Types.ObjectId, ref: "Author" }],
   },
   { timestamps: true }
 )
