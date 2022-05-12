@@ -161,6 +161,31 @@ usersRouter.get("/:userId/purchaseHistory/:bookId", async (req, res, next) => {
 
 usersRouter.put("/:userId/purchaseHistory/:bookId", async (req, res, next) => {
   try {
+    // 1. Find the user
+    const user = await UsersModel.findById(req.params.userId) // user is a MONGOOSE DOCUMENT, not a normal object --> it has some SUPERPOWERS
+
+    if (user) {
+      // 2. Use JavaScript to modify him
+
+      // 2.1 Find Index of the element
+
+      const index = user.purchaseHistory.findIndex(book => book._id.toString() === req.params.bookId)
+
+      if (index !== -1) {
+        // 2.2 If index is found --> update the element in that position
+        const oldObject = user.purchaseHistory[index].toObject()
+
+        user.purchaseHistory[index] = { ...oldObject, ...req.body }
+
+        // 3. Save it back
+        await user.save() // since user is a MONGOOSE DOCUMENT I can use .save()
+        res.send(user)
+      } else {
+        next(createError(404, `Book with id ${req.params.bookId} not found!`))
+      }
+    } else {
+      next(createError(404, `User with id ${req.params.userId} not found!`))
+    }
   } catch (error) {
     next(error)
   }
@@ -168,6 +193,16 @@ usersRouter.put("/:userId/purchaseHistory/:bookId", async (req, res, next) => {
 
 usersRouter.delete("/:userId/purchaseHistory/:bookId", async (req, res, next) => {
   try {
+    const modifiedUser = await UsersModel.findByIdAndUpdate(
+      req.params.userId, //WHO
+      { $pull: { purchaseHistory: { _id: req.params.bookId } } }, // HOW
+      { new: true } // OPTIONS
+    )
+    if (modifiedUser) {
+      res.send(modifiedUser)
+    } else {
+      next(createError(404, `User with id ${req.params.userId} not found!`))
+    }
   } catch (error) {
     next(error)
   }
